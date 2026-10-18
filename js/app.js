@@ -1,19 +1,25 @@
 // Punto de entrada: registro de módulos, menú lateral y enrutador por hash.
 import { $, $$, charts, closeModal, refreshChrome } from './ui.js';
+import { renderDashboard } from './views/dashboard.js';
 import { renderProducts } from './views/productos.js';
 import { renderMovements } from './views/movimientos.js';
 import { renderKardex } from './views/kardex.js';
 import { renderPOS } from './views/ventas.js';
 import { renderHistory } from './views/historial.js';
+import { renderReports } from './views/reportes.js';
+import { renderConfig } from './views/config.js';
 
 const routes = {
+  dashboard: { group: '', icon: '▦', label: 'Panel principal', subtitle: 'Resumen del día y alertas de inventario', render: renderDashboard },
   productos: { group: 'Control de stock', icon: '◫', label: 'Productos', subtitle: 'Catálogo, precios y niveles de stock', render: renderProducts },
   movimientos: { group: 'Control de stock', icon: '⇅', label: 'Ingresos y ajustes', subtitle: 'Entrada de mercadería y ajustes por inventario físico', render: renderMovements },
   kardex: { group: 'Control de stock', icon: '≣', label: 'Kardex', subtitle: 'Historial de movimientos por producto', render: renderKardex },
   ventas: { group: 'Ventas', icon: '⊕', label: 'Punto de venta', subtitle: 'Registro de ventas con descuento automático de stock', render: renderPOS },
   historial: { group: 'Ventas', icon: '⎘', label: 'Historial de ventas', subtitle: 'Comprobantes emitidos y anulaciones', render: renderHistory },
+  reportes: { group: 'Gestión', icon: '◔', label: 'Reportes', subtitle: 'Ventas, productos más vendidos e inventario valorizado', render: renderReports },
+  config: { group: 'Gestión', icon: '⚙', label: 'Configuración', subtitle: 'Datos de la tienda y respaldo de información', render: renderConfig },
 };
-const HOME = 'productos';
+const HOME = 'dashboard';
 
 function buildNav() {
   let group = null;
