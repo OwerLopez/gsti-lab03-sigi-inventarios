@@ -43,6 +43,10 @@ export function commit(fn, okMsg) {
 }
 
 export function toast(msg, kind = '') {
+  // Un mismo aviso repetido (p. ej., varios clics sin stock) no se apila: se reemplaza.
+  $$('#toasts .toast').filter((t) => t.textContent === msg).forEach((t) => t.remove());
+  const box = $('#toasts');
+  while (box.children.length >= 4) box.firstElementChild.remove();
   const el = document.createElement('div');
   el.className = `toast ${kind}`;
   el.textContent = msg;
