@@ -1,0 +1,8 @@
+flowchart TB
+  R["1. Requisitos<br/>SRS IEEE 830"] -->|"aprobación SRS"| D["2. Diseño<br/>arquitectura · ER · flujos"]
+  D -->|"aprobación diseño"| I["3. Implementación<br/>BD y módulos"]
+  I -->|"código completo"| T["4. Pruebas<br/>sistema y aceptación"]
+  T -->|"acta de aceptación"| M["5. Despliegue y<br/>mantenimiento"]
+  CR(["CR-01: métodos de pago<br/>(Día 6)"]) -.->|"reabre SRS v1.1"| R
+  CR -.->|"rehace modelo y flujo"| D
+  style CR fill:#fde9ea,stroke:#c0262d,color:#7a1015
