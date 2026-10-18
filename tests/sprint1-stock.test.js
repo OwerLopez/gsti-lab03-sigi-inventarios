@@ -1,7 +1,7 @@
 // Pruebas de aceptación · sprint1-stock. Ejecutar con: npm test
 import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { DomainError, createProduct, kardex, lowStockProducts, registerEntry, searchProducts, setProductActive, updateProduct } from '../js/inventory.js';
+import { DomainError, adjustStock, createProduct, kardex, lowStockProducts, registerEntry, searchProducts, setProductActive, updateProduct } from '../js/inventory.js';
 import { fixture, T } from './helpers.js';
 
 let s;
@@ -61,5 +61,14 @@ describe('Sprint 1 · Control de stock', () => {
     const k = kardex(s, leche.id);
     assert.deepEqual(k.map((m) => [m.type, m.qty, m.balance]), [['INGRESO', 6, 6], ['INGRESO', 10, 16]]);
     assert.equal(k[1].reference, 'Prov.: Gloria');
+  });
+
+  // HU-19 (arrastrada del Sprint 1 y terminada en el Sprint 2)
+  test('HU-19: el ajuste por inventario físico deja trazabilidad en el kardex', () => {
+    adjustStock(s, { productId: leche.id, countedStock: 4, reason: 'Merma' }, T('11:00'));
+    const k = kardex(s, leche.id);
+    assert.equal(k.at(-1).qty, -2);
+    assert.equal(k.at(-1).balance, 4);
+    assert.throws(() => adjustStock(s, { productId: leche.id, countedStock: 4, reason: 'x' }), /igual/);
   });
 });

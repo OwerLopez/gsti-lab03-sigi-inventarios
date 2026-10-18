@@ -1,10 +1,10 @@
 /**
  * Datos de demostración de "Minimarket Sumaq" (tienda ficticia de Arequipa).
- * Genera el catálogo, los ingresos iniciales con un
+ * Genera el catálogo, los ingresos iniciales y ~30 días de ventas con un
  * generador pseudoaleatorio con semilla fija, para que todos los integrantes
  * del equipo vean exactamente los mismos datos al abrir la aplicación.
  */
-import { createEmptyState, createProduct, registerEntry } from './inventory.js';
+import { createEmptyState, createProduct, registerEntry, registerSale, cancelSale, adjustStock } from './inventory.js';
 
 export const CATALOG = [
   // sku, nombre, categoría, unidad, costo, precio, stock mínimo, stock inicial
@@ -36,6 +36,17 @@ export const CATALOG = [
   ['PAN-001', 'Pan de molde Bimbo blanco', 'Panadería', 'PAQ', 6.4, 8.2, 8, 24],
 ];
 
+// Generador pseudoaleatorio determinista (mulberry32).
+function rng(seed) {
+  let t = seed >>> 0;
+  return () => {
+    t += 0x6d2b79f5;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 const pad = (n) => String(n).padStart(2, '0');
 function isoAt(day, hour, minute) {
   const d = new Date(day);
@@ -47,6 +58,7 @@ function isoAt(day, hour, minute) {
  * @param {number} days días de historial de ventas
  */
 export function buildDemoState(today = new Date(), days = 30) {
+  const random = rng(20261017);
   const state = createEmptyState();
   const start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - days);
   const opening = isoAt(new Date(start.getTime() - 86400000), 8, 0);
@@ -56,9 +68,12 @@ export function buildDemoState(today = new Date(), days = 30) {
   }
 
   const byId = state.products;
+  const methods = ['EFECTIVO', 'EFECTIVO', 'EFECTIVO', 'YAPE', 'YAPE', 'PLIN', 'TARJETA'];
+  const customers = ['', '', '', '', 'Rosa Quispe', 'Juan Mamani', 'Bodega El Tambito', 'Lucía Flores'];
 
   for (let d = 0; d <= days; d += 1) {
     const day = new Date(start.getFullYear(), start.getMonth(), start.getDate() + d);
+    const weekend = day.getDay() === 0 || day.getDay() === 6;
 
     // Reposición dos veces por semana (lunes y jueves) de lo que esté cerca del mínimo.
     if ((day.getDay() === 1 || day.getDay() === 4) && d > 0) {
@@ -69,7 +84,32 @@ export function buildDemoState(today = new Date(), days = 30) {
         }
       }
     }
+
+    const tickets = Math.floor((weekend ? 16 : 10) + random() * 8);
+    const times = Array.from({ length: tickets }, () => [8 + Math.floor(random() * 13), Math.floor(random() * 60)])
+      .sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    for (const [hour, minute] of times) {
+      const nItems = 1 + Math.floor(random() * 4);
+      const items = [];
+      for (let i = 0; i < nItems; i += 1) {
+        const p = byId[Math.floor(random() * byId.length)];
+        const qty = 1 + Math.floor(random() * (p.price < 5 ? 4 : 2));
+        if (p.stock - qty > 0) items.push({ productId: p.id, qty });
+      }
+      if (!items.length) continue;
+      try {
+        registerSale(state, { items, paymentMethod: methods[Math.floor(random() * methods.length)], customer: customers[Math.floor(random() * customers.length)] },
+          { at: isoAt(day, hour, minute), user: random() > 0.5 ? 'caja01' : 'caja02' });
+      } catch {
+        /* línea sin stock: se omite en la simulación */
+      }
+    }
   }
+  // Casos de demostración: una anulación y un ajuste por merma.
+  const lastSale = state.sales[state.sales.length - 5];
+  if (lastSale) cancelSale(state, lastSale.id, 'Cliente desistió de la compra', { at: lastSale.at, user: 'admin' });
+  const yogurt = state.products.find((p) => p.sku === 'LAC-002');
+  if (yogurt.stock > 2) adjustStock(state, { productId: yogurt.id, countedStock: yogurt.stock - 2, reason: 'Merma: 2 unidades vencidas' }, { at: isoAt(today, 7, 50), user: 'admin' });
 
   return state;
 }

@@ -3,11 +3,15 @@ import { $, $$, charts, closeModal, refreshChrome } from './ui.js';
 import { renderProducts } from './views/productos.js';
 import { renderMovements } from './views/movimientos.js';
 import { renderKardex } from './views/kardex.js';
+import { renderPOS } from './views/ventas.js';
+import { renderHistory } from './views/historial.js';
 
 const routes = {
   productos: { group: 'Control de stock', icon: '◫', label: 'Productos', subtitle: 'Catálogo, precios y niveles de stock', render: renderProducts },
   movimientos: { group: 'Control de stock', icon: '⇅', label: 'Ingresos y ajustes', subtitle: 'Entrada de mercadería y ajustes por inventario físico', render: renderMovements },
   kardex: { group: 'Control de stock', icon: '≣', label: 'Kardex', subtitle: 'Historial de movimientos por producto', render: renderKardex },
+  ventas: { group: 'Ventas', icon: '⊕', label: 'Punto de venta', subtitle: 'Registro de ventas con descuento automático de stock', render: renderPOS },
+  historial: { group: 'Ventas', icon: '⎘', label: 'Historial de ventas', subtitle: 'Comprobantes emitidos y anulaciones', render: renderHistory },
 };
 const HOME = 'productos';
 
