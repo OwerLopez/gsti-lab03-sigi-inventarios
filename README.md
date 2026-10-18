@@ -10,8 +10,8 @@ El mismo producto se abordó con dos equipos en paralelo para comparar enfoques:
 | Equipo Cascada | Modelo en cascada (Royce) | Requisitos (SRS), diseño y avance de implementación en [`docs/cascada`](docs/cascada) |
 
 **Demo en línea:** https://owerlopez.github.io/gsti-lab03-sigi-inventarios/
-**Tablero Scrum (GitHub Projects):** ver la pestaña *Projects* del repositorio.
-**Product Backlog:** [Issues](../../issues) · **Sprints:** [Milestones](../../milestones)
+**Tablero (GitHub Projects):** https://github.com/users/OwerLopez/projects/3
+**Product Backlog:** [Issues](https://github.com/OwerLopez/gsti-lab03-sigi-inventarios/issues?q=is%3Aissue) · **Sprints y fases:** [Milestones](https://github.com/OwerLopez/gsti-lab03-sigi-inventarios/milestones?state=closed) · **Release:** [v1.0.0](https://github.com/OwerLopez/gsti-lab03-sigi-inventarios/releases/tag/v1.0.0)
 
 ## Funcionalidades (Release 1)
 
