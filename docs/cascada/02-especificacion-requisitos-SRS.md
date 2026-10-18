@@ -1,10 +1,11 @@
 # Especificación de Requisitos de Software (SRS) — IEEE 830
 
-**Versión:** 1.0 · **Elaborado por:** M. Congona (analista) · **Revisado por:** J. Coronado, A. Chaisa · **Aprobado por:** dueño de Minimarket Sumaq
+**Versión:** 1.1 (incluye CR-01) · **Elaborado por:** M. Congona (analista) · **Revisado por:** J. Coronado, A. Chaisa · **Aprobado por:** dueño de Minimarket Sumaq
 
 | Versión | Cambio |
 |---|---|
 | 1.0 | Línea base aprobada al cierre de la fase de requisitos (D4) |
+| 1.1 | CR-01: método de pago en ventas y reporte de cierre de caja (RF-09, RF-15, RN-06) |
 
 ## 1. Introducción
 **1.1 Propósito.** Definir los requisitos del sistema de gestión de inventarios de Minimarket Sumaq.
@@ -28,11 +29,13 @@
 | RF-06 | Emitir alertas de productos con stock ≤ stock mínimo | Alta |
 | RF-07 | Mostrar el kardex de cada producto con saldo | Media |
 | RF-08 | Registrar ventas con uno o más productos, descontando el stock | Alta |
+| RF-09 | Registrar el método de pago de cada venta: efectivo, tarjeta, Yape o Plin *(CR-01)* | Alta |
 | RF-10 | Impedir ventas con cantidad mayor al stock disponible | Alta |
 | RF-11 | Anular ventas con motivo y devolver el stock | Media |
 | RF-12 | Emitir comprobante (boleta) imprimible | Media |
 | RF-13 | Reporte de ventas por período | Alta |
 | RF-14 | Reporte de productos más vendidos | Alta |
+| RF-15 | Reporte de ventas por método de pago (cierre de caja) *(CR-01)* | Alta |
 | RF-16 | Reporte de inventario valorizado y lista de reposición | Media |
 | RF-17 | Exportar reportes a CSV | Baja |
 
@@ -58,6 +61,7 @@
 | RN-03 | Los precios incluyen IGV; operación gravada = total / 1,18 |
 | RN-04 | Los comprobantes siguen la serie B001 con correlativo de 6 dígitos |
 | RN-05 | Una venta anulada no se elimina; cambia a estado ANULADA |
+| RN-06 | En pagos en efectivo se registra el monto recibido y el vuelto *(CR-01)* |
 
 ## 6. Casos de uso principales
 
@@ -71,4 +75,5 @@ flowchart LR
   C((Cajero)) --- CU6[Registrar venta]
   C --- CU7[Emitir boleta]
   CU6 -. incluye .-> CU8[Validar stock]
+  CU6 -. incluye .-> CU9[Registrar método de pago]
 ```

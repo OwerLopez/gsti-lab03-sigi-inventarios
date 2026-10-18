@@ -1,0 +1,19 @@
+flowchart TD
+  A([Inicio]) --> B[Cajero busca y agrega productos al carrito]
+  B --> C{¿Stock suficiente para cada línea?}
+  C -- No --> C1[Mostrar mensaje de stock insuficiente] --> B
+  C -- Sí --> D[Calcular total, op. gravada e IGV]
+  D --> E[Seleccionar método de pago]
+  E --> F{¿Efectivo?}
+  F -- Sí --> G[Ingresar monto recibido]
+  G --> H{¿Monto ≥ total?}
+  H -- No --> G
+  H -- Sí --> I[Calcular vuelto]
+  F -- No --> J[Confirmar pago digital]
+  I --> K[Generar comprobante B001-n]
+  J --> K
+  K --> L[Registrar SALIDA en kardex y descontar stock]
+  L --> M{¿Stock ≤ mínimo?}
+  M -- Sí --> N[Generar alerta de reposición]
+  M -- No --> O[Imprimir boleta]
+  N --> O --> P([Fin])

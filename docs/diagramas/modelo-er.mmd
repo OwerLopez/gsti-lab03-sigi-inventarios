@@ -1,0 +1,61 @@
+erDiagram
+  CATEGORIA ||--o{ PRODUCTO : clasifica
+  PRODUCTO ||--o{ MOVIMIENTO : registra
+  PRODUCTO ||--o{ DETALLE_VENTA : "se vende en"
+  VENTA ||--|{ DETALLE_VENTA : contiene
+  USUARIO ||--o{ VENTA : emite
+  USUARIO ||--o{ MOVIMIENTO : realiza
+  PROVEEDOR ||--o{ MOVIMIENTO : abastece
+  METODO_PAGO ||--o{ VENTA : "se paga con"
+
+  CATEGORIA { int id_categoria PK
+    varchar nombre }
+  PRODUCTO { int id_producto PK
+    varchar sku UK
+    varchar nombre
+    int id_categoria FK
+    varchar unidad
+    decimal costo_promedio
+    decimal precio_venta
+    int stock_actual
+    int stock_minimo
+    boolean activo }
+  MOVIMIENTO { int id_movimiento PK
+    datetime fecha
+    int id_producto FK
+    varchar tipo
+    int cantidad
+    decimal costo_unitario
+    int saldo
+    int id_proveedor FK
+    varchar referencia
+    varchar motivo
+    int id_usuario FK }
+  VENTA { int id_venta PK
+    varchar serie_numero UK
+    datetime fecha
+    varchar cliente
+    varchar metodo_pago FK
+    decimal op_gravada
+    decimal igv
+    decimal total
+    decimal monto_recibido
+    decimal vuelto
+    varchar estado
+    varchar motivo_anulacion
+    int id_usuario FK }
+  DETALLE_VENTA { int id_venta PK
+    int id_producto PK
+    int cantidad
+    decimal precio_unitario
+    decimal costo_unitario
+    decimal importe }
+  USUARIO { int id_usuario PK
+    varchar usuario UK
+    varchar nombre
+    varchar rol }
+  PROVEEDOR { int id_proveedor PK
+    varchar ruc UK
+    varchar razon_social }
+  METODO_PAGO { varchar codigo PK
+    varchar descripcion }
