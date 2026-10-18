@@ -1,0 +1,20 @@
+flowchart TB
+  subgraph Equipo["Equipo (6 integrantes)"]
+    S["Equipo Scrum<br/>PO · SM · Developers"]
+    C["Equipo Cascada<br/>JP · Arquitecto · QA"]
+  end
+  subgraph GitHub["GitHub (gratuito, colaborativo)"]
+    ISS["Issues<br/>Product Backlog"]
+    MS["Milestones<br/>Sprints y fases"]
+    PRJ["Projects<br/>Tablero Scrum / Cascada"]
+    REPO["Repositorio Git<br/>código + docs"]
+    ACT["Actions<br/>CI: npm test"]
+    PG["Pages<br/>demo en línea"]
+  end
+  S --> ISS & PRJ & REPO
+  C --> MS & PRJ & REPO
+  ISS --> PRJ
+  MS --> PRJ
+  REPO -->|"push / pull request"| ACT
+  ACT -->|"verde"| PG
+  PG --> U["Usuarios / docente<br/>navegador"]
