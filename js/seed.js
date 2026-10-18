@@ -68,7 +68,7 @@ export function buildDemoState(today = new Date(), days = 30) {
   }
 
   const byId = state.products;
-  const methods = ['EFECTIVO'];
+  const methods = ['EFECTIVO', 'EFECTIVO', 'EFECTIVO', 'YAPE', 'YAPE', 'PLIN', 'TARJETA'];
   const customers = ['', '', '', '', 'Rosa Quispe', 'Juan Mamani', 'Bodega El Tambito', 'Lucía Flores'];
 
   for (let d = 0; d <= days; d += 1) {

@@ -38,6 +38,13 @@ describe('Sprint 2 · Registro de ventas', () => {
     assert.throws(() => cancelSale(s, sale.id, 'otra vez'), /ya fue anulada/);
   });
 
+  test('HU-11 (cambio del cliente): acepta Yape/Plin/Tarjeta y rechaza métodos desconocidos', () => {
+    const y = registerSale(s, { items: [{ productId: leche.id, qty: 1 }], paymentMethod: 'YAPE' }, T('14:00'));
+    assert.equal(y.paymentMethod, 'YAPE');
+    assert.equal(y.change, 0);
+    assert.throws(() => registerSale(s, { items: [{ productId: leche.id, qty: 1 }], paymentMethod: 'BITCOIN' }), /Método de pago/);
+  });
+
   test('HU-07: en efectivo exige monto recibido suficiente', () => {
     assert.throws(() => registerSale(s, { items: [{ productId: arroz.id, qty: 1 }], amountReceived: 20 }), /insuficiente/);
   });

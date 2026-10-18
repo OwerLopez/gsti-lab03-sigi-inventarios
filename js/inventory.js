@@ -10,6 +10,9 @@ export const IGV = 0.18;
 
 export const PAYMENT_METHODS = {
   EFECTIVO: 'Efectivo',
+  TARJETA: 'Tarjeta',
+  YAPE: 'Yape',
+  PLIN: 'Plin',
 };
 
 export const MOVEMENT_TYPES = {
