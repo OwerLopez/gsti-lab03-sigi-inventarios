@@ -1,0 +1,10 @@
+flowchart LR
+  A((Administrador)) --- CU1[Gestionar productos]
+  A --- CU2[Registrar ingreso de mercadería]
+  A --- CU3[Ajustar inventario]
+  A --- CU4[Anular venta]
+  A --- CU5[Generar reportes]
+  C((Cajero)) --- CU6[Registrar venta]
+  C --- CU7[Emitir boleta]
+  CU6 -. incluye .-> CU8[Validar stock]
+  CU6 -. incluye .-> CU9[Registrar método de pago]
