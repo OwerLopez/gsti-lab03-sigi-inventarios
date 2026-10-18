@@ -1,0 +1,11 @@
+flowchart TD
+  A([Inicio]) --> B[Seleccionar producto]
+  B --> C{¿Producto activo?}
+  C -- No --> C1[Rechazar ingreso] --> Z([Fin])
+  C -- Sí --> D[Ingresar cantidad, costo y proveedor]
+  D --> E{¿Cantidad > 0?}
+  E -- No --> D
+  E -- Sí --> F[Recalcular costo promedio ponderado]
+  F --> G[Sumar al stock y registrar INGRESO en kardex]
+  G --> H[Actualizar alertas de stock]
+  H --> Z

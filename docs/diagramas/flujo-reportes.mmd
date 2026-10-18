@@ -1,0 +1,16 @@
+flowchart TD
+  A([Inicio]) --> B[Elegir tipo de reporte]
+  B --> C[Definir rango de fechas]
+  C --> D[Consultar ventas EMITIDAS del rango]
+  D --> E{Tipo}
+  E -- Ventas por día --> F[Agrupar por fecha]
+  E -- Más vendidos --> G[Sumar unidades por producto y ordenar]
+  E -- Método de pago --> H[Agrupar por método]
+  E -- Valorizado --> I[Stock x costo promedio por producto]
+  F & G & H & I --> J[Mostrar tabla y gráfico]
+  J --> K{¿Exportar?}
+  K -- CSV --> L[Descargar archivo]
+  K -- Imprimir --> M[Vista de impresión]
+  K -- No --> N([Fin])
+  L --> N
+  M --> N
