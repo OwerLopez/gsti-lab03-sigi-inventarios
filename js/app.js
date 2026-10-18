@@ -7,6 +7,7 @@ import { renderKardex } from './views/kardex.js';
 import { renderPOS } from './views/ventas.js';
 import { renderHistory } from './views/historial.js';
 import { renderReports } from './views/reportes.js';
+import { renderConfig } from './views/config.js';
 
 const routes = {
   dashboard: { group: '', icon: '▦', label: 'Panel principal', subtitle: 'Resumen del día y alertas de inventario', render: renderDashboard },
@@ -16,6 +17,7 @@ const routes = {
   ventas: { group: 'Ventas', icon: '⊕', label: 'Punto de venta', subtitle: 'Registro de ventas con descuento automático de stock', render: renderPOS },
   historial: { group: 'Ventas', icon: '⎘', label: 'Historial de ventas', subtitle: 'Comprobantes emitidos y anulaciones', render: renderHistory },
   reportes: { group: 'Gestión', icon: '◔', label: 'Reportes', subtitle: 'Ventas, productos más vendidos e inventario valorizado', render: renderReports },
+  config: { group: 'Gestión', icon: '⚙', label: 'Configuración', subtitle: 'Datos de la tienda y respaldo de información', render: renderConfig },
 };
 const HOME = 'dashboard';
 
