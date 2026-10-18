@@ -86,8 +86,10 @@ export function buildDemoState(today = new Date(), days = 30) {
     }
 
     const tickets = Math.floor((weekend ? 16 : 10) + random() * 8);
-    const times = Array.from({ length: tickets }, () => [8 + Math.floor(random() * 13), Math.floor(random() * 60)])
+    let times = Array.from({ length: tickets }, () => [8 + Math.floor(random() * 13), Math.floor(random() * 60)])
       .sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    // El día de hoy solo tiene ventas hasta la hora actual.
+    if (d === days) times = times.filter(([h, m]) => h * 60 + m <= today.getHours() * 60 + today.getMinutes());
     for (const [hour, minute] of times) {
       const nItems = 1 + Math.floor(random() * 4);
       const items = [];

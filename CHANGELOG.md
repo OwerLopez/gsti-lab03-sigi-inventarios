@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.2] - Corrección
+### Corregido
+- Los datos de demostración ya no generan ventas del día con hora posterior a la actual.
+
 ## [1.0.1] - Corrección
 ### Corregido
 - Los avisos repetidos (p. ej., varios clics sobre un producto sin stock) ya no se apilan en pantalla; como máximo se muestran 4.
