@@ -99,3 +99,22 @@ export function movRow(m, withProduct) {
     ${withProduct ? `<td>${esc(p?.name)}</td>` : ''}<td class="num">${m.qty > 0 ? '+' : ''}${m.qty}</td><td class="num">${money(m.unitCost)}</td>
     <td class="num"><b>${m.balance}</b></td><td>${esc([m.reference, m.note].filter(Boolean).join(' · '))}</td><td>${m.user}</td></tr>`;
 }
+
+export function receiptHTML(s) {
+  const st = ctx.state.settings;
+  return `<div class="receipt print-area">
+    <h4>${esc(st.storeName)}</h4><div class="c">RUC ${st.ruc}<br>${esc(st.address)}</div><hr>
+    <div class="c"><b>BOLETA DE VENTA ELECTRÓNICA</b><br>${s.id}</div>
+    ${s.status === 'ANULADA' ? `<div class="anulada">ANULADA — ${esc(s.cancelReason)}</div>` : ''}
+    <div>Fecha: ${fmtDateTime(s.at)}<br>Cliente: ${esc(s.customer)}<br>Cajero: ${s.user}</div><hr>
+    <table><thead><tr><th>Cant.</th><th>Descripción</th><th class="num">Importe</th></tr></thead><tbody>
+    ${s.lines.map((l) => `<tr><td>${l.qty}</td><td>${esc(l.name)}<br><small>${money(l.price)} c/u</small></td><td class="num">${money(l.amount)}</td></tr>`).join('')}
+    </tbody></table><hr>
+    <table><tr><td>Op. gravada</td><td class="num">${money(s.subtotal)}</td></tr><tr><td>IGV 18 %</td><td class="num">${money(s.igv)}</td></tr>
+    <tr><td><b>TOTAL</b></td><td class="num"><b>${money(s.total)}</b></td></tr><tr><td>Pago: ${inv.PAYMENT_METHODS[s.paymentMethod]}</td><td class="num">${s.change ? `Vuelto ${money(s.change)}` : ''}</td></tr></table>
+    <hr><div class="c">¡Gracias por su compra!</div></div>`;
+}
+export function showReceipt(s) {
+  openModal(`Comprobante ${s.id}`, `${receiptHTML(s)}<div class="actions no-print"><button class="btn secondary" data-close>Cerrar</button><button class="btn" id="print">Imprimir</button></div>`,
+    (root) => { $('#print', root).onclick = () => window.print(); });
+}

@@ -208,6 +208,75 @@ export function kardex(state, productId) {
   return state.movements.filter((m) => m.productId === productId).sort((a, b) => a.at.localeCompare(b.at));
 }
 
+/* ------------------------------------------------------------------ */
+/* Ventas (HU-07 a HU-12)                                             */
+/* ------------------------------------------------------------------ */
+
+/** Precios con IGV incluido (práctica habitual en el retail peruano). */
+export function computeTotals(lines) {
+  const total = round2(lines.reduce((acc, l) => acc + l.qty * l.price - (l.discount || 0), 0));
+  const subtotal = round2(total / (1 + IGV));
+  return { subtotal, igv: round2(total - subtotal), total };
+}
+
+export function registerSale(state, { items, paymentMethod = 'EFECTIVO', amountReceived, customer = '' }, { at = nowISO(), user = 'caja01' } = {}) {
+  if (!Array.isArray(items) || items.length === 0) throw new DomainError('La venta no tiene productos.');
+  if (!PAYMENT_METHODS[paymentMethod]) throw new DomainError(`Método de pago no válido: ${paymentMethod}.`);
+
+  // Se agrupan líneas repetidas y se valida TODO el stock antes de mover nada.
+  const grouped = new Map();
+  for (const it of items) {
+    const qty = requireNumber(it.qty, 'cantidad', { integer: true, strictlyPositive: true });
+    grouped.set(it.productId, (grouped.get(it.productId) || 0) + qty);
+  }
+  const lines = [];
+  for (const [productId, qty] of grouped) {
+    const p = findProduct(state, productId);
+    if (!p.active) throw new DomainError(`El producto "${p.name}" está desactivado.`);
+    if (p.stock < qty) throw new DomainError(`Stock insuficiente de "${p.name}": disponible ${p.stock}, solicitado ${qty}.`);
+    lines.push({ productId, sku: p.sku, name: p.name, qty, price: p.price, cost: p.cost, discount: 0, amount: round2(qty * p.price) });
+  }
+
+  const totals = computeTotals(lines);
+  let change = 0;
+  if (paymentMethod === 'EFECTIVO') {
+    const received = amountReceived === undefined || amountReceived === '' ? totals.total : requireNumber(amountReceived, 'monto recibido');
+    if (received < totals.total) throw new DomainError(`Monto recibido insuficiente: falta S/ ${(totals.total - received).toFixed(2)}.`);
+    change = round2(received - totals.total);
+  }
+
+  const sale = {
+    id: nextId(state, 'sale', 'B001', 6),
+    at,
+    user,
+    customer: customer.trim() || 'Cliente varios',
+    paymentMethod,
+    lines,
+    ...totals,
+    change,
+    status: 'EMITIDA',
+  };
+  for (const l of lines) {
+    pushMovement(state, { productId: l.productId, type: MOVEMENT_TYPES.SALIDA, qty: -l.qty, unitCost: l.cost, reference: sale.id }, { at, user });
+  }
+  state.sales.push(sale);
+  return sale;
+}
+
+export function cancelSale(state, saleId, reason, { at = nowISO(), user = 'admin' } = {}) {
+  const sale = state.sales.find((s) => s.id === saleId);
+  if (!sale) throw new DomainError(`No existe la venta ${saleId}.`);
+  if (sale.status === 'ANULADA') throw new DomainError(`La venta ${saleId} ya fue anulada.`);
+  const why = requireText(reason, 'motivo de anulación');
+  for (const l of sale.lines) {
+    pushMovement(state, { productId: l.productId, type: MOVEMENT_TYPES.DEVOLUCION, qty: l.qty, unitCost: l.cost, reference: sale.id, note: why }, { at, user });
+  }
+  sale.status = 'ANULADA';
+  sale.cancelReason = why;
+  sale.cancelledAt = at;
+  return sale;
+}
+
 /** Exportación a CSV compatible con Excel/LibreOffice/Google Sheets (separador ;). */
 export function toCSV(rows, columns) {
   const esc = (v) => {
