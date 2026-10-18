@@ -1,0 +1,10 @@
+flowchart TB
+  PB[("Product Backlog<br/>26 ítems · 70 SP<br/>(GitHub Issues)")] --> SP{{"Sprint Planning<br/>objetivo + compromiso"}}
+  SP --> SB[("Sprint Backlog<br/>(Milestone del sprint)")]
+  SB --> SPR["Sprint<br/>1 semana simulada"]
+  SPR <--> D(("Daily Scrum<br/>cada día"))
+  SPR --> INC["Incremento<br/>CI en verde + GitHub Pages"]
+  INC --> REV{{"Sprint Review<br/>con el dueño de la tienda"}}
+  REV --> RET{{"Retrospectiva<br/>Start · Stop · Continue"}}
+  REV -. "cambios y retroalimentación (HU-11)" .-> PB
+  RET -. "mejoras del proceso" .-> SP
