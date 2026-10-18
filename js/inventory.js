@@ -280,6 +280,84 @@ export function cancelSale(state, saleId, reason, { at = nowISO(), user = 'admin
   return sale;
 }
 
+/* ------------------------------------------------------------------ */
+/* Reportes (HU-13 a HU-17)                                           */
+/* ------------------------------------------------------------------ */
+
+const dayOf = (iso) => iso.slice(0, 10);
+
+function salesInRange(state, from, to) {
+  return state.sales.filter((s) => s.status === 'EMITIDA' && (!from || dayOf(s.at) >= from) && (!to || dayOf(s.at) <= to));
+}
+
+export function salesByDay(state, { from, to } = {}) {
+  const map = new Map();
+  for (const s of salesInRange(state, from, to)) {
+    const d = dayOf(s.at);
+    const row = map.get(d) || { day: d, tickets: 0, total: 0 };
+    row.tickets += 1;
+    row.total = round2(row.total + s.total);
+    map.set(d, row);
+  }
+  return [...map.values()].sort((a, b) => a.day.localeCompare(b.day));
+}
+
+export function topProducts(state, { from, to, limit = 10 } = {}) {
+  const map = new Map();
+  for (const s of salesInRange(state, from, to)) {
+    for (const l of s.lines) {
+      const row = map.get(l.productId) || { productId: l.productId, sku: l.sku, name: l.name, units: 0, revenue: 0, margin: 0 };
+      row.units += l.qty;
+      row.revenue = round2(row.revenue + l.amount);
+      row.margin = round2(row.margin + (l.price / (1 + IGV) - l.cost) * l.qty);
+      map.set(l.productId, row);
+    }
+  }
+  return [...map.values()].sort((a, b) => b.units - a.units || b.revenue - a.revenue).slice(0, limit);
+}
+
+export function salesByPaymentMethod(state, { from, to } = {}) {
+  const res = Object.keys(PAYMENT_METHODS).map((k) => ({ method: k, label: PAYMENT_METHODS[k], tickets: 0, total: 0 }));
+  for (const s of salesInRange(state, from, to)) {
+    const row = res.find((r) => r.method === s.paymentMethod);
+    row.tickets += 1;
+    row.total = round2(row.total + s.total);
+  }
+  return res;
+}
+
+export function inventoryValuation(state) {
+  const rows = state.products.filter((p) => p.active).map((p) => ({
+    sku: p.sku, name: p.name, category: p.category, stock: p.stock,
+    cost: p.cost, price: p.price,
+    valueCost: round2(p.stock * p.cost),
+    valuePrice: round2(p.stock * p.price),
+  }));
+  const byCategory = {};
+  for (const r of rows) byCategory[r.category] = round2((byCategory[r.category] || 0) + r.valueCost);
+  return {
+    rows,
+    byCategory,
+    totalCost: round2(rows.reduce((a, r) => a + r.valueCost, 0)),
+    totalPrice: round2(rows.reduce((a, r) => a + r.valuePrice, 0)),
+  };
+}
+
+export function dashboard(state, today = new Date().toISOString().slice(0, 10)) {
+  const todaySales = salesInRange(state, today, today);
+  const monthPrefix = today.slice(0, 7);
+  const monthSales = state.sales.filter((s) => s.status === 'EMITIDA' && s.at.startsWith(monthPrefix));
+  return {
+    salesToday: round2(todaySales.reduce((a, s) => a + s.total, 0)),
+    ticketsToday: todaySales.length,
+    salesMonth: round2(monthSales.reduce((a, s) => a + s.total, 0)),
+    averageTicket: monthSales.length ? round2(monthSales.reduce((a, s) => a + s.total, 0) / monthSales.length) : 0,
+    activeProducts: state.products.filter((p) => p.active).length,
+    lowStock: lowStockProducts(state).length,
+    inventoryValue: inventoryValuation(state).totalCost,
+  };
+}
+
 /** Exportación a CSV compatible con Excel/LibreOffice/Google Sheets (separador ;). */
 export function toCSV(rows, columns) {
   const esc = (v) => {
