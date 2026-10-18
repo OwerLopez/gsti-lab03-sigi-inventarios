@@ -1,0 +1,13 @@
+{
+  "name": "sigi-inventarios",
+  "version": "1.0.0",
+  "description": "SIGI Retail: sistema de gestión de inventarios para tienda minorista (control de stock, ventas y reportes)",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test",
+    "start": "npx --yes http-server -p 8080 -c-1 ."
+  },
+  "engines": { "node": ">=20" },
+  "license": "MIT"
+}
