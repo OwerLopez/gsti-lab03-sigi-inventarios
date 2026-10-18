@@ -182,6 +182,16 @@ export function registerEntry(state, { productId, qty, unitCost, supplier = '', 
   }, { at, user });
 }
 
+/** Ajuste por inventario físico: el usuario indica el stock contado. */
+export function adjustStock(state, { productId, countedStock, reason }, { at = nowISO(), user = 'admin' } = {}) {
+  const product = findProduct(state, productId);
+  const counted = requireNumber(countedStock, 'stock contado', { integer: true });
+  const why = requireText(reason, 'motivo del ajuste');
+  const diff = counted - product.stock;
+  if (diff === 0) throw new DomainError('El stock contado es igual al stock del sistema; no hay ajuste que registrar.');
+  return pushMovement(state, { productId, type: MOVEMENT_TYPES.AJUSTE, qty: diff, note: why }, { at, user });
+}
+
 export function isLowStock(product) {
   return product.active && product.stock <= product.minStock;
 }
