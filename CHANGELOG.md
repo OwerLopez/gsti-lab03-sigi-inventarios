@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.1] - Corrección
+### Corregido
+- Los avisos repetidos (p. ej., varios clics sobre un producto sin stock) ya no se apilan en pantalla; como máximo se muestran 4.
+
 ## [1.0.0] - Release 1 (Sprint 3)
 ### Agregado
 - Panel principal con KPIs y gráficos (HU-13).
