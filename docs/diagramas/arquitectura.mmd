@@ -1,0 +1,20 @@
+flowchart LR
+  subgraph Cliente["Capa de presentación (navegador)"]
+    UI1[Pantallas de stock]
+    UI2[Punto de venta]
+    UI3[Reportes]
+  end
+  subgraph Logica["Capa de lógica de negocio"]
+    S1[Servicio de productos]
+    S2[Servicio de inventario / kardex]
+    S3[Servicio de ventas]
+    S4[Servicio de reportes]
+  end
+  subgraph Datos["Capa de datos"]
+    DB[(Base de datos relacional)]
+  end
+  UI1 --> S1 & S2
+  UI2 --> S3
+  UI3 --> S4
+  S1 & S2 & S3 & S4 --> DB
+  S3 -->|descuenta stock| S2
